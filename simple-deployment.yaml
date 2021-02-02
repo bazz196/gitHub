@@ -1,0 +1,26 @@
+apiVersion : apps/v1   # версия api kubernetis
+kind: Deployment
+metadata:
+  name: pre-prod #название деплоймента
+  labels:
+    app : just-my-label
+spec: #с какими подами будет работать этот деплоймент
+  replicas: 3
+  selector:
+    matchLabels:
+      project: CherryLabs
+  template:
+    metadata:
+      labels:
+        project: CherryLabs   #описываем имя пода
+    spec:
+      containers:
+        - name : middlepoint
+          image: adv4000/k8sphp:version2
+          ports:
+            - containerPort: 80
+#
+#        - name: meta
+#          image: adv4000/k8sphp:version1
+#          ports:
+#            - containerPort: 8080

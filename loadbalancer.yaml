@@ -1,0 +1,49 @@
+apiVersion : apps/v1   # версия api kubernetis
+kind: Deployment
+metadata:
+  name: pre-prod #название деплоймента
+  labels:
+    app : just-my-label
+spec: #с какими подами будет работать этот деплоймент
+  replicas: 3
+  selector:
+    matchLabels:
+      project: CherryLabs
+  template:
+    metadata:
+      labels:
+        project: CherryLabs   #описываем имя пода сторка 38 коннектится сюда
+    spec:
+      containers:
+        - name : middlepoint
+          image: adv4000/k8sphp:latest
+          ports:
+            - containerPort: 80
+#
+#        - name: meta
+#          image: adv4000/k8sphp:version1
+#          ports:
+#            - containerPort: 8080
+
+---
+apiVersion: v1
+kind: service
+metadata:
+  name: pod-service
+  lables:
+    env  : local
+    owner: IK
+spec:
+  type: LoadBalancer
+  selector:
+    project: CherryLabs #delecting PODS with those lables
+  ports:
+    - name      : app-listener
+      protocol  : TCP
+      port      : 80 # Port on Load Balancer
+      targetPort: 80 # Port on POD
+
+    - name      : app-listener
+      protocol  : TCP
+      port      : 8080 # Port on Load Balancer
+      targetPort: 8888 # Port on POD

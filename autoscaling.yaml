@@ -1,0 +1,43 @@
+apiVersion : apps/v1   # версия api kubernetis
+kind: Deployment
+metadata:
+  name: pre-prod2 #название деплоймента
+  labels:
+    app : just-my-label
+spec: #с какими подами будет работать этот деплоймент
+  replicas: 3
+  selector:
+    matchLabels:
+      project: CherryLabs2
+  template:
+    metadata:
+      labels:
+        project: CherryLabs2   #описываем имя пода
+    spec:
+      containers:
+        - name : middlepoint
+          image: adv4000/k8sphp:version2
+          ports:
+             - containerPort: 80
+
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: my-autoscaling
+spec:
+  scaleTargetRef:
+    apiVersion: autoscaling/v2beta1v1
+    kind: Deployment
+    name: pre-prod2
+  minReplicas: 3
+  maxReplicas: 6
+  mectrics:
+    - type: Resource
+      resorce:
+        name: cpu
+        targetAverageUtilization: 70
+    - type: Resource
+        resorce:
+          name: memory
+          targetAverageUtilization: 80
